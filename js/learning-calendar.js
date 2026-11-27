@@ -9,9 +9,9 @@
     const get = type => parts.find(part => part.type === type).value;
     return `${get('year')}-${get('month')}-${get('day')}`;
   };
-  const calendarYear = year => {
-    const first = new Date(Date.UTC(year, 0, 1));
-    const last = new Date(Date.UTC(year, 11, 31));
+  const calendarRange = (firstKey, lastKey) => {
+    const first = dateFromKey(firstKey);
+    const last = dateFromKey(lastKey);
     const start = new Date(first.getTime() - first.getUTCDay() * DAY);
     const days = [];
     for (let value = first.getTime(); value <= last.getTime(); value += DAY) {
@@ -20,14 +20,22 @@
     }
     return {days, weeks: days[days.length - 1].week + 1};
   };
-  if (typeof module !== 'undefined' && module.exports) module.exports = {calendarYear, todayInZone};
+  const calendarYear = year => calendarRange(`${year}-01-01`, `${year}-12-31`);
+  const calendarPeriod = (startKey, offset) => {
+    const first = dateFromKey(startKey);
+    const next = dateFromKey(startKey);
+    first.setUTCFullYear(first.getUTCFullYear() + offset);
+    next.setUTCFullYear(next.getUTCFullYear() + offset + 1);
+    return {start: dateKey(first), end: dateKey(new Date(next.getTime() - DAY))};
+  };
+  if (typeof module !== 'undefined' && module.exports) module.exports = {calendarYear, calendarRange, calendarPeriod, todayInZone};
   if (typeof document === 'undefined') return;
   const panel = document.querySelector('#learning');
   if (!panel) return;
 
   const $ = selector => document.querySelector(selector);
   const grid = $('#learning-calendar');
-  const yearSelect = $('#learning-year');
+  const periodSelect = $('#learning-period');
   const summary = $('#learning-summary');
   const dialog = $('#learning-dialog');
   const message = $('#learning-dialog-message');
@@ -43,7 +51,11 @@
   const startDate = panel.dataset.startDate;
   const startYear = Number(startDate.slice(0, 4));
   let today = todayInZone(zone);
-  let year = Number(today.slice(0, 4));
+  const currentPeriod = () => {
+    const candidate = Math.max(0, Number(today.slice(0, 4)) - startYear);
+    return today < calendarPeriod(startDate, candidate).start ? Math.max(0, candidate - 1) : candidate;
+  };
+  let period = currentPeriod();
   let checkins = new Set();
   let publicLoaded = false;
   let isOwner = false;
@@ -56,19 +68,23 @@
   let authRequest = 0;
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const longDate = key => new Intl.DateTimeFormat('en-US', {timeZone: 'UTC', month: 'long', day: 'numeric', year: 'numeric'}).format(dateFromKey(key));
-  $('#learning-start-date').textContent = longDate(startDate);
   const configured = /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(panel.dataset.supabaseUrl) && /^sb_publishable_[A-Za-z0-9_-]+$/.test(panel.dataset.publishableKey);
   const client = configured && window.supabase ? window.supabase.createClient(panel.dataset.supabaseUrl, panel.dataset.publishableKey, {
     auth: {persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'na-english-journal-auth'}
   }) : null;
 
-  for (let optionYear = year + 1; optionYear >= startYear; optionYear--) {
-    const option = document.createElement('option');
-    option.value = String(optionYear);
-    option.textContent = String(optionYear);
-    option.selected = optionYear === year;
-    yearSelect.append(option);
+  function renderPeriodOptions() {
+    periodSelect.replaceChildren();
+    for (let optionPeriod = currentPeriod() + 1; optionPeriod >= 0; optionPeriod--) {
+      const range = calendarPeriod(startDate, optionPeriod);
+      const option = document.createElement('option');
+      option.value = String(optionPeriod);
+      option.textContent = `${range.start.slice(0, 4)}–${range.end.slice(0, 4)}`;
+      option.selected = optionPeriod === period;
+      periodSelect.append(option);
+    }
   }
+  renderPeriodOptions();
   const dirty = () => entryLoaded && (notes.value !== (savedEntry ? savedEntry.notes : '') || checked.checked !== (savedEntry ? savedEntry.checked_in : true));
   const mayDiscard = () => !dirty() || window.confirm('Discard your unsaved changes?');
   const clearPrivateEntry = () => {
@@ -93,7 +109,14 @@
   });
 
   function renderCalendar() {
-    const calendar = calendarYear(year);
+    const range = calendarPeriod(startDate, period);
+    const calendar = calendarRange(range.start, range.end);
+    const rangeStart = $('#learning-range-start');
+    const rangeEnd = $('#learning-range-end');
+    rangeStart.dateTime = range.start;
+    rangeStart.textContent = longDate(range.start);
+    rangeEnd.dateTime = range.end;
+    rangeEnd.textContent = longDate(range.end);
     grid.replaceChildren();
     grid.style.setProperty('--weeks', calendar.weeks);
     [['Mon', 3], ['Wed', 5], ['Fri', 7]].forEach(([label, row]) => {
@@ -104,8 +127,10 @@
       element.style.gridRow = row;
       grid.append(element);
     });
+    // Very short first months share too little space with the next label.
+    const nextMonthWeek = calendar.days.find(day => day.day === 1 && day.key !== range.start)?.week ?? calendar.weeks;
     calendar.days.forEach(day => {
-      if (day.day === 1) {
+      if (day.day === 1 || (day.key === range.start && nextMonthWeek >= 3)) {
         const label = document.createElement('span');
         label.className = 'learning-month';
         label.textContent = monthNames[day.month];
@@ -115,24 +140,24 @@
       }
       const button = document.createElement('button');
       const future = day.key > today;
-      const beforeStart = day.key < startDate;
-      const marked = !beforeStart && publicLoaded && checkins.has(day.key);
-      const status = beforeStart ? 'Before tracking started' : future ? 'Future date' : !publicLoaded ? 'Status unavailable' : marked ? 'Checked in' : 'Not checked in';
+      const marked = publicLoaded && checkins.has(day.key);
+      const status = future ? 'Future date' : !publicLoaded ? 'Status unavailable' : marked ? 'Checked in' : 'Not checked in';
       button.type = 'button';
-      button.className = 'learning-day' + (beforeStart ? ' is-before-start' : '') + (marked ? ' is-checked' : '') + (day.key === today ? ' is-today' : '') + (!beforeStart && !publicLoaded ? ' is-unknown' : '');
+      button.className = 'learning-day' + (marked ? ' is-checked' : '') + (day.key === today ? ' is-today' : '') + (!publicLoaded ? ' is-unknown' : '');
       button.style.gridColumn = day.week + 2;
       button.style.gridRow = day.row + 2;
       button.dataset.date = day.key;
       button.title = `${longDate(day.key)} · ${status}`;
-      button.setAttribute('aria-label', button.title + (isOwner && !future && !beforeStart ? '. Edit private entry' : ''));
-      button.disabled = future || beforeStart;
+      button.setAttribute('aria-label', button.title + (isOwner && !future ? '. Edit private entry' : ''));
+      button.disabled = future;
       grid.append(button);
     });
   }
 
   async function refreshCalendar() {
     const request = ++calendarRequest;
-    const targetYear = year;
+    const targetPeriod = period;
+    const range = calendarPeriod(startDate, targetPeriod);
     if (!client) {
       publicLoaded = false;
       renderCalendar();
@@ -141,14 +166,13 @@
     }
     summary.textContent = 'Loading check-ins…';
     try {
-      const firstDate = `${targetYear}-01-01` < startDate ? startDate : `${targetYear}-01-01`;
-      const {data, error} = await client.from('learning_checkins').select('study_date').gte('study_date', firstDate).lte('study_date', `${targetYear}-12-31`).order('study_date');
+      const {data, error} = await client.from('learning_checkins').select('study_date').gte('study_date', range.start).lte('study_date', range.end).order('study_date');
       if (error) throw error;
-      if (request !== calendarRequest || targetYear !== year) return;
+      if (request !== calendarRequest || targetPeriod !== period) return;
       checkins = new Set(data.map(row => row.study_date));
       publicLoaded = true;
       renderCalendar();
-      summary.textContent = `${checkins.size} ${checkins.size === 1 ? 'day' : 'days'} of learning in ${year}`;
+      summary.textContent = `${checkins.size} ${checkins.size === 1 ? 'day' : 'days'} of learning in this period`;
     } catch (_) {
       if (request !== calendarRequest) return;
       publicLoaded = false;
@@ -204,8 +228,8 @@
     message.textContent = !publicLoaded ? 'Check-in status is currently unavailable.' : checkins.has(selectedDate) ? 'Checked in for learning. Journal entries are private.' : 'No public check-in for this day. Journal entries are private.';
     openDialog();
   });
-  yearSelect.addEventListener('change', () => {
-    year = Number(yearSelect.value);
+  periodSelect.addEventListener('change', () => {
+    period = Number(periodSelect.value);
     checkins.clear();
     publicLoaded = false;
     renderCalendar();
@@ -304,6 +328,7 @@
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
       today = todayInZone(zone);
+      renderPeriodOptions();
       void refreshCalendar();
       void syncIdentity();
     }

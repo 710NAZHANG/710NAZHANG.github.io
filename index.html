@@ -17,9 +17,9 @@
   <link rel="stylesheet" href="/css/academic.css?v=73819b7d65e4">
   <script defer src="/js/academic.js?v=dd0e34621464"></script>
   
-  <link rel="stylesheet" href="/css/learning.css?v=e66d2dbe69f2">
+  <link rel="stylesheet" href="/css/learning.css?v=6a16ea4363a1">
   <script defer src="/js/vendor/supabase.js?v=8816af04d991"></script>
-  <script defer src="/js/learning-calendar.js?v=0d2857e463e8"></script>
+  <script defer src="/js/learning-calendar.js?v=b25365ef20df"></script>
   
 <meta name="generator" content="Hexo 6.3.0"></head>
 <body class="home-page">
@@ -57,13 +57,13 @@
   data-start-date="2026-11-27">
   <div class="learning-heading">
     <div><p class="eyebrow">A little, every day</p><h2 id="learning-title">Learning</h2></div>
-    <label class="learning-year-label">Year<select id="learning-year" aria-label="Calendar year"></select></label>
+    <label class="learning-period-label">Period<select id="learning-period" aria-label="Calendar period"></select></label>
   </div>
-  <p class="learning-intro">One square, one day. Building a habit of learning.<span class="learning-start">Tracking since <time id="learning-start-date" datetime="2026-11-27">2026-11-27</time>.</span></p>
+  <p class="learning-intro">One square, one day. Building a habit of learning.<span class="learning-range"><time id="learning-range-start" datetime="2026-11-27">2026-11-27</time> – <time id="learning-range-end"></time></span></p>
   <div class="learning-scroll" tabindex="0" role="region" aria-label="Learning calendar; scroll horizontally to see all months">
     <div class="learning-calendar" id="learning-calendar" aria-label="Daily learning"></div>
   </div>
-  <div class="learning-legend"><span><i class="learning-swatch is-before-start"></i>Before start date</span><span><i class="learning-swatch"></i>Not checked in</span><span><i class="learning-swatch is-checked"></i>Checked in</span></div>
+  <div class="learning-legend"><span><i class="learning-swatch"></i>Not checked in</span><span><i class="learning-swatch is-checked"></i>Checked in</span></div>
   <div class="learning-bottom">
     <p id="learning-summary" class="learning-summary" role="status">Loading calendar…</p>
     <div class="learning-account-actions"><button id="learning-signin" class="learning-text-button" type="button">My journal</button><button id="learning-signout" class="learning-text-button" type="button" hidden>Sign out</button></div>
