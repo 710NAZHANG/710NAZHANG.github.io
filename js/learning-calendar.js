@@ -40,6 +40,8 @@
   const signInButton = $('#learning-signin');
   const signOutButton = $('#learning-signout');
   const zone = panel.dataset.timeZone || 'America/New_York';
+  const startDate = panel.dataset.startDate;
+  const startYear = Number(startDate.slice(0, 4));
   let today = todayInZone(zone);
   let year = Number(today.slice(0, 4));
   let checkins = new Set();
@@ -54,12 +56,13 @@
   let authRequest = 0;
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const longDate = key => new Intl.DateTimeFormat('en-US', {timeZone: 'UTC', month: 'long', day: 'numeric', year: 'numeric'}).format(dateFromKey(key));
+  $('#learning-start-date').textContent = longDate(startDate);
   const configured = /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(panel.dataset.supabaseUrl) && /^sb_publishable_[A-Za-z0-9_-]+$/.test(panel.dataset.publishableKey);
   const client = configured && window.supabase ? window.supabase.createClient(panel.dataset.supabaseUrl, panel.dataset.publishableKey, {
     auth: {persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'na-english-journal-auth'}
   }) : null;
 
-  for (let optionYear = year + 1; optionYear >= year - 5; optionYear--) {
+  for (let optionYear = year + 1; optionYear >= startYear; optionYear--) {
     const option = document.createElement('option');
     option.value = String(optionYear);
     option.textContent = String(optionYear);
@@ -112,16 +115,17 @@
       }
       const button = document.createElement('button');
       const future = day.key > today;
-      const marked = publicLoaded && checkins.has(day.key);
-      const status = future ? 'Future date' : !publicLoaded ? 'Status unavailable' : marked ? 'Checked in' : 'Not checked in';
+      const beforeStart = day.key < startDate;
+      const marked = !beforeStart && publicLoaded && checkins.has(day.key);
+      const status = beforeStart ? 'Before tracking started' : future ? 'Future date' : !publicLoaded ? 'Status unavailable' : marked ? 'Checked in' : 'Not checked in';
       button.type = 'button';
-      button.className = 'learning-day' + (marked ? ' is-checked' : '') + (day.key === today ? ' is-today' : '') + (!publicLoaded ? ' is-unknown' : '');
+      button.className = 'learning-day' + (beforeStart ? ' is-before-start' : '') + (marked ? ' is-checked' : '') + (day.key === today ? ' is-today' : '') + (!beforeStart && !publicLoaded ? ' is-unknown' : '');
       button.style.gridColumn = day.week + 2;
       button.style.gridRow = day.row + 2;
       button.dataset.date = day.key;
       button.title = `${longDate(day.key)} · ${status}`;
-      button.setAttribute('aria-label', button.title + (isOwner && !future ? '. Edit private entry' : ''));
-      button.disabled = future;
+      button.setAttribute('aria-label', button.title + (isOwner && !future && !beforeStart ? '. Edit private entry' : ''));
+      button.disabled = future || beforeStart;
       grid.append(button);
     });
   }
@@ -137,13 +141,14 @@
     }
     summary.textContent = 'Loading check-ins…';
     try {
-      const {data, error} = await client.from('learning_checkins').select('study_date').gte('study_date', `${targetYear}-01-01`).lte('study_date', `${targetYear}-12-31`).order('study_date');
+      const firstDate = `${targetYear}-01-01` < startDate ? startDate : `${targetYear}-01-01`;
+      const {data, error} = await client.from('learning_checkins').select('study_date').gte('study_date', firstDate).lte('study_date', `${targetYear}-12-31`).order('study_date');
       if (error) throw error;
       if (request !== calendarRequest || targetYear !== year) return;
       checkins = new Set(data.map(row => row.study_date));
       publicLoaded = true;
       renderCalendar();
-      summary.textContent = `${checkins.size} ${checkins.size === 1 ? 'day' : 'days'} of English practice in ${year}`;
+      summary.textContent = `${checkins.size} ${checkins.size === 1 ? 'day' : 'days'} of learning in ${year}`;
     } catch (_) {
       if (request !== calendarRequest) return;
       publicLoaded = false;
@@ -155,14 +160,14 @@
   function showLogin() {
     if (saving || !mayDiscard()) return;
     clearPrivateEntry();
-    $('#learning-dialog-title').textContent = 'My English journal';
+    $('#learning-dialog-title').textContent = 'My journal';
     loginForm.hidden = !client;
     message.textContent = client ? 'Journal access is restricted to the owner.' : 'The private journal is not connected yet. Editing will be available after setup.';
     openDialog();
   }
 
   async function loadEntry(key) {
-    if (!client || !isOwner || saving || !mayDiscard()) return;
+    if (!client || !isOwner || key < startDate || key > today || saving || !mayDiscard()) return;
     clearPrivateEntry();
     const request = ++entryRequest;
     selectedDate = key;
@@ -196,7 +201,7 @@
     clearPrivateEntry();
     loginForm.hidden = true;
     $('#learning-dialog-title').textContent = longDate(selectedDate);
-    message.textContent = !publicLoaded ? 'Check-in status is currently unavailable.' : checkins.has(selectedDate) ? 'Checked in for English practice. Journal entries are private.' : 'No public check-in for this day. Journal entries are private.';
+    message.textContent = !publicLoaded ? 'Check-in status is currently unavailable.' : checkins.has(selectedDate) ? 'Checked in for learning. Journal entries are private.' : 'No public check-in for this day. Journal entries are private.';
     openDialog();
   });
   yearSelect.addEventListener('change', () => {

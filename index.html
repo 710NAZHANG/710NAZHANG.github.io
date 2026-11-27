@@ -17,9 +17,9 @@
   <link rel="stylesheet" href="/css/academic.css?v=73819b7d65e4">
   <script defer src="/js/academic.js?v=dd0e34621464"></script>
   
-  <link rel="stylesheet" href="/css/learning.css?v=125614a839a7">
+  <link rel="stylesheet" href="/css/learning.css?v=e66d2dbe69f2">
   <script defer src="/js/vendor/supabase.js?v=8816af04d991"></script>
-  <script defer src="/js/learning-calendar.js?v=388a65bbe292"></script>
+  <script defer src="/js/learning-calendar.js?v=0d2857e463e8"></script>
   
 <meta name="generator" content="Hexo 6.3.0"></head>
 <body class="home-page">
@@ -53,16 +53,17 @@
   data-supabase-url="https://tpmybnhjeibkiczthctd.supabase.co"
   data-publishable-key="sb_publishable_V2bCvKBhYNfy8ilNXdP04g_PlI3iuHM"
   data-owner-email="nazhangchn@gmail.com"
-  data-time-zone="America/New_York">
+  data-time-zone="America/New_York"
+  data-start-date="2026-11-27">
   <div class="learning-heading">
-    <div><p class="eyebrow">A little, every day</p><h2 id="learning-title">Learning English</h2></div>
+    <div><p class="eyebrow">A little, every day</p><h2 id="learning-title">Learning</h2></div>
     <label class="learning-year-label">Year<select id="learning-year" aria-label="Calendar year"></select></label>
   </div>
-  <p class="learning-intro">One square, one day. Building a habit of learning.</p>
-  <div class="learning-scroll" tabindex="0" role="region" aria-label="English practice calendar; scroll horizontally to see all months">
-    <div class="learning-calendar" id="learning-calendar" aria-label="Daily English practice"></div>
+  <p class="learning-intro">One square, one day. Building a habit of learning.<span class="learning-start">Tracking since <time id="learning-start-date" datetime="2026-11-27">2026-11-27</time>.</span></p>
+  <div class="learning-scroll" tabindex="0" role="region" aria-label="Learning calendar; scroll horizontally to see all months">
+    <div class="learning-calendar" id="learning-calendar" aria-label="Daily learning"></div>
   </div>
-  <div class="learning-legend"><span><i class="learning-swatch"></i>Not checked in</span><span><i class="learning-swatch is-checked"></i>Checked in</span></div>
+  <div class="learning-legend"><span><i class="learning-swatch is-before-start"></i>Before start date</span><span><i class="learning-swatch"></i>Not checked in</span><span><i class="learning-swatch is-checked"></i>Checked in</span></div>
   <div class="learning-bottom">
     <p id="learning-summary" class="learning-summary" role="status">Loading calendar…</p>
     <div class="learning-account-actions"><button id="learning-signin" class="learning-text-button" type="button">My journal</button><button id="learning-signout" class="learning-text-button" type="button" hidden>Sign out</button></div>
@@ -71,7 +72,7 @@
   <noscript><p>Enable JavaScript to view the learning calendar.</p></noscript>
 </section>
 <dialog class="learning-dialog" id="learning-dialog" aria-labelledby="learning-dialog-title">
-  <div class="learning-dialog-heading"><h2 id="learning-dialog-title">My English journal</h2><button type="button" id="learning-close" aria-label="Close journal">×</button></div>
+  <div class="learning-dialog-heading"><h2 id="learning-dialog-title">My journal</h2><button type="button" id="learning-close" aria-label="Close journal">×</button></div>
   <p id="learning-dialog-message" role="status" aria-live="polite"></p>
   <form id="learning-login" hidden>
     <p>Sign in to read and edit your private journal.</p>
@@ -82,7 +83,7 @@
   <form id="learning-entry" hidden>
     <p class="learning-entry-privacy">Only you can read this entry.</p>
     <label for="learning-notes">What did you learn today?</label>
-    <textarea id="learning-notes" rows="12" maxlength="50000" placeholder="New words, useful expressions, listening practice, and reflections…"></textarea>
+    <textarea id="learning-notes" rows="12" maxlength="50000" placeholder="Notes, ideas, new things you learned, and reflections…"></textarea>
     <label class="learning-check-label"><input id="learning-checked" type="checkbox">Show this day as checked in on my public calendar</label>
     <div class="learning-entry-actions"><button class="button button-primary" id="learning-save" type="submit">Save entry</button><button class="button button-secondary" type="button" id="learning-reload">Reload saved entry</button></div>
     <p id="learning-save-status" role="status" aria-live="polite"></p>
