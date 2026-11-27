@@ -78,6 +78,7 @@ sub { font-size: .65em; }
 .research-card:hover { border-color: #9fbabf; box-shadow: 0 7px 24px rgba(24,52,66,.06); }
 .research-visual { position: relative; aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--line); background: #f9fbfb; overflow: hidden; text-decoration: none; }
 .research-visual img, .research-visual > .research-crop { width: 100%; height: 100%; object-fit: contain; padding: 22px 24px; }
+.home-page .research-visual.research-visual--full img { padding: 0; max-height: none; }
 .research-visual--titled { flex-direction: column; align-items: stretch; gap: 12px; padding: 22px 24px; }
 .research-visual-title { flex: 0 0 auto; color: var(--ink); font-size: 1.8rem; line-height: 1.4; font-weight: 700; transform: translateY(8px); }
 .research-visual--titled > .research-crop { flex: 1 1 0; min-height: 0; padding: 0; }
