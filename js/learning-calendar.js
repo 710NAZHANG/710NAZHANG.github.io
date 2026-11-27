@@ -111,12 +111,8 @@
   function renderCalendar() {
     const range = calendarPeriod(startDate, period);
     const calendar = calendarRange(range.start, range.end);
-    const rangeStart = $('#learning-range-start');
-    const rangeEnd = $('#learning-range-end');
-    rangeStart.dateTime = range.start;
-    rangeStart.textContent = longDate(range.start);
-    rangeEnd.dateTime = range.end;
-    rangeEnd.textContent = longDate(range.end);
+    periodSelect.title = `${longDate(range.start)} – ${longDate(range.end)}`;
+    grid.setAttribute('aria-label', `Daily learning: ${periodSelect.title}`);
     grid.replaceChildren();
     grid.style.setProperty('--weeks', calendar.weeks);
     [['Mon', 3], ['Wed', 5], ['Fri', 7]].forEach(([label, row]) => {

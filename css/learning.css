@@ -7,8 +7,6 @@
 .learning-period-label { font-size: .8rem; color: var(--muted); }
 .learning-period-label select { display: block; padding: 6px 24px 6px 10px; border: 1px solid var(--line); border-radius: 4px; background: white; color: var(--ink); font-size: 1rem; }
 .learning-intro { color: var(--muted); font-size: 1rem; margin: 18px 0 24px; }
-.learning-range { display: block; font-size: .85rem; margin-top: 6px; }
-.learning-range time { display: inline-block; }
 .learning-scroll { overflow-x: auto; padding: 4px 2px 10px; scrollbar-width: thin; }
 .learning-calendar { --cell: 12px; --cell-gap: 3px; display: grid; grid-template-columns: 32px repeat(var(--weeks, 53), var(--cell)); grid-template-rows: 24px repeat(7, var(--cell)); gap: var(--cell-gap); width: max-content; min-height: 132px; }
 .learning-month { align-self: start; overflow: visible; font-size: 11px; color: var(--muted); white-space: nowrap; }
@@ -26,7 +24,6 @@
 .learning-summary { font-size: .9rem; margin: 0; }
 .learning-text-button { padding: 0; border: 0; background: transparent; color: var(--accent); font-size: .9rem; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 .learning-account-actions { display: flex; flex-wrap: wrap; gap: 16px; }
-.learning-privacy { font-size: .75rem; color: var(--muted); margin: 12px 0 0; }
 .learning-dialog { color: var(--ink); width: min(720px, calc(100% - 32px)); max-height: calc(100dvh - 40px); border: 1px solid var(--line); border-radius: 10px; padding: 28px; overflow-y: auto; }
 .learning-dialog::backdrop { background: rgba(24, 52, 66, .4); }
 .learning-dialog-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
