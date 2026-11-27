@@ -80,7 +80,7 @@ sub { font-size: .65em; }
 .research-visual img, .research-visual > .research-crop { width: 100%; height: 100%; object-fit: contain; padding: 22px 24px; }
 .home-page .research-visual.research-visual--full img { padding: 0; max-height: none; }
 .research-visual--titled { flex-direction: column; align-items: stretch; gap: 12px; padding: 22px 24px; }
-.research-visual-title { flex: 0 0 auto; color: var(--ink); font-size: 1.8rem; line-height: 1.4; font-weight: 700; transform: translateY(8px); }
+.research-visual-title { flex: 0 0 auto; color: var(--ink); font-size: 1.8rem; line-height: 1.4; font-weight: 400; transform: translateY(8px); }
 .research-visual--titled > .research-crop { flex: 1 1 0; min-height: 0; padding: 0; }
 .research-card-body { padding: 26px 28px 28px; }
 .research-card-body .eyebrow { font-size: 1rem; margin-bottom: 10px; }
