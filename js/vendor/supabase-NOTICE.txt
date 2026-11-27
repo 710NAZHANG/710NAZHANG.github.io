@@ -1,0 +1,4 @@
+@supabase/supabase-js 2.119.2, MIT license (see supabase-LICENSE.txt).
+Source: https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.js
+SHA-256: 8816af04d9915dbba1882d6f84f0b402dc40268063a63d9c66d24f52f371c263
+Official installation documentation: https://supabase.com/docs/reference/javascript/installing
