@@ -71,6 +71,8 @@ sub { font-size: .65em; }
 .section-heading > p { max-width: 285px; font-size: .875rem; color: var(--muted); margin: 0 0 3px; }
 .section-heading > .text-link { white-space: nowrap; margin-bottom: 4px; }
 #research-title { font-size: 1.125rem; }
+.home-research { width: 100%; }
+.home-research > .section-heading { padding-inline: 24px; }
 .research-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 38px; }
 .research-card { min-width: 0; border: 1px solid var(--line); background: white; border-radius: 4px; overflow: hidden; transition: box-shadow .2s, border-color .2s; }
 .research-card:hover { border-color: #9fbabf; box-shadow: 0 7px 24px rgba(24,52,66,.06); }
